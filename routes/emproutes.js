@@ -7,7 +7,6 @@ const empRouter = express.Router();
 
 
 
-// server.js (continued)
 
 // Create
 empRouter.post('/', auth, async (req, res) => {
@@ -22,9 +21,62 @@ empRouter.post('/', auth, async (req, res) => {
 
 // Read
 // Example route to fetch all employees
+// empRouter.get('/', auth, async (req, res) => {
+//     try {
+//         const employees = await EmployeeModel.find();
+//         res.send(employees);
+//     } catch (error) {
+//         res.status(500).send({ error: 'Internal server error' });
+//     }
+// });
+// server.js (continued)
+
+// Read with Pagination
 empRouter.get('/', auth, async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
     try {
-        const employees = await EmployeeModel.find();
+        const employees = await EmployeeModel.find()
+            .skip((page - 1) * limit)
+            .limit(limit);
+        res.send(employees);
+    } catch (error) {
+        res.status(500).send({ error: 'Internal server error' });
+    }
+});
+
+//tofilter
+empRouter.get('/filter', auth, async (req, res) => {
+    const { department } = req.query;
+    try {
+        const employees = await EmployeeModel.find({ department });
+        res.send(employees);
+    } catch (error) {
+        res.status(500).send({ error: 'Internal server error' });
+    }
+});
+
+
+
+
+
+//tosort
+empRouter.get('/sort', auth, async (req, res) => {
+    const { sortBy } = req.query;
+    try {
+        const employees = await EmployeeModel.find().sort({ salary: sortBy });
+        res.send(employees);
+    } catch (error) {
+        res.status(500).send({ error: 'Internal server error' });
+    }
+});
+
+
+//tosearch
+empRouter.get('/search', auth, async (req, res) => {
+    const { firstName } = req.query;
+    try {
+        const employees = await EmployeeModel.find({ firstName: { $regex: new RegExp(firstName, 'i') } });
         res.send(employees);
     } catch (error) {
         res.status(500).send({ error: 'Internal server error' });
