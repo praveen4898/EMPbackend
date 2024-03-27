@@ -8,7 +8,7 @@ require("dotenv").config();
 const app = express();
 app.use(express.json());
 
-app.use("/user",userRouter)
+app.use("/",userRouter)
 app.use("/employees",empRouter)
 
 app.use("/",(req,res)=>{
